@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>¿Qué hacemos en Bellas Artes? — Altea</title>
-  <link rel="stylesheet" href="estilos.css">
+<link rel="stylesheet" href="estilos.css?v=5">
 </head>
 <body>
 
@@ -162,7 +162,7 @@
           document.getElementById('zona-principal').scrollIntoView({ behavior: 'smooth' });
           if (EDICIONES_ANTERIORES.length > 0) {
             const primerBtn = selectorMeses.querySelector('.btn-mes');
-            cargarArchivoMes(EDICIONES_ANTERIORES[0], primerBtn);
+            cargarArchivoMes(EDICIONES_ANTERIORES, primerBtn);
           } else {
             document.getElementById('titulo-sala').textContent = 'Archivo de Exposiciones';
             document.getElementById('grid-obras').innerHTML = '<p>Aún no hay ediciones anteriores archivadas.</p>';
