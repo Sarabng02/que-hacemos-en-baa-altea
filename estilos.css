@@ -7,6 +7,7 @@
   --acento: #2C3E35;           /* Verde museo oscuro elegante */
 }
 
+html { scroll-behavior: smooth; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -18,28 +19,35 @@ body {
 
 .oculto { display: none !important; }
 
-/* Cabecera */
+/* Cabecera fija arriba */
 .cabecera {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(247, 245, 240, 0.94);
+  backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--borde-suave);
+  padding: 1rem 2rem;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: flex-end;
-  gap: 1.5rem;
+  align-items: center;
+  gap: 1rem;
 }
 
-.marca h1 { font-size: 1.7rem; font-weight: 600; letter-spacing: -0.02em; }
-.marca p { color: var(--texto-secundario); font-size: 0.95rem; margin-top: 0.2rem; }
+.marca-mini {
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+}
 
-.menu { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.menu { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .btn-nav {
   background: transparent;
   border: 1px solid transparent;
-  padding: 0.5rem 1rem;
-  font-size: 0.95rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
   color: var(--texto-secundario);
   cursor: pointer;
   border-radius: 4px;
@@ -52,8 +60,58 @@ body {
   font-weight: 500;
 }
 
+/* Portada de bienvenida (Hero) */
+.hero {
+  min-height: 78vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 1.5rem;
+  border-bottom: 1px solid var(--borde-suave);
+  background: radial-gradient(circle at center, #FCFBF8 0%, #F2EFE9 100%);
+}
+
+.hero-contenido { max-width: 780px; }
+
+.hero-etiqueta {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+  margin-bottom: 1.2rem;
+}
+
+.hero h1 {
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 1.2rem;
+}
+
+.hero-subtitulo {
+  font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+  color: var(--texto-secundario);
+  font-weight: 400;
+  margin-bottom: 2.5rem;
+}
+
+.btn-explorar {
+  display: inline-block;
+  padding: 0.85rem 1.8rem;
+  background: var(--acento);
+  color: #FFFFFF;
+  text-decoration: none;
+  border-radius: 30px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.btn-explorar:hover { transform: translateY(2px); opacity: 0.92; }
+
 /* Contenedor principal */
-.contenedor { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+.contenedor { max-width: 1200px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem; }
 
 .barra-info {
   display: flex;
@@ -61,9 +119,9 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
-.barra-info h2 { font-size: 1.25rem; font-weight: 500; }
+.barra-info h2 { font-size: 1.4rem; font-weight: 500; }
 
 .filtros-mes { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .btn-mes {
@@ -127,11 +185,10 @@ body {
   font-weight: 500;
   color: var(--acento);
 }
-
 /* Sección Participar */
 .caja-participar {
   max-width: 650px;
-  margin: 2rem auto;
+  margin: 1rem auto;
   background: var(--blanco-tarjeta);
   padding: 2.5rem;
   border: 1px solid var(--borde-suave);
@@ -140,31 +197,21 @@ body {
 .caja-participar h2 { margin-bottom: 1rem; font-size: 1.4rem; }
 .caja-participar p { color: var(--texto-secundario); margin-bottom: 1.8rem; }
 
-/* Botones */
-.btn-principal {
-  display: inline-block;
-  background: var(--acento);
-  color: #FFFFFF;
+/* Botones de ficha */
+.btn-principal, .btn-secundario, .btn-destacado {
+  display: block;
   text-decoration: none;
-  padding: 0.75rem 1.4rem;
+  padding: 0.7rem 1.2rem;
   border-radius: 4px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
   text-align: center;
+  transition: opacity 0.2s;
 }
-.btn-principal:hover { opacity: 0.92; }
-
-.btn-secundario {
-  display: inline-block;
-  background: transparent;
-  color: var(--texto-principal);
-  border: 1px solid var(--texto-principal);
-  text-decoration: none;
-  padding: 0.75rem 1.4rem;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  text-align: center;
-}
+.btn-principal { background: var(--acento); color: #FFFFFF; }
+.btn-secundario { background: var(--blanco-tarjeta); color: var(--texto-principal); border: 1px solid var(--texto-principal); }
+.btn-destacado { background: #EFECE6; color: var(--texto-principal); border: 1px solid var(--borde-suave); }
+.btn-principal:hover, .btn-secundario:hover, .btn-destacado:hover { opacity: 0.85; }
 
 /* Modal / Ficha técnica */
 .modal {
@@ -208,12 +255,21 @@ body {
   .modal-cuerpo { grid-template-columns: 1fr; }
 }
 
+.aviso-zoom {
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+  margin-bottom: 0.6rem;
+}
+
 .modal-media img {
   width: 100%;
   border-radius: 4px;
   margin-bottom: 1rem;
   border: 1px solid var(--borde-suave);
+  cursor: zoom-in;
+  transition: opacity 0.2s;
 }
+.modal-media img:hover { opacity: 0.92; }
 
 .video-wrapper {
   position: relative;
@@ -263,12 +319,49 @@ body {
 }
 .lista-tecnica dt { color: var(--texto-secundario); font-weight: 500; }
 
-.acciones-ficha { display: flex; flex-direction: column; gap: 0.7rem; }
+.titulo-contacto {
+  font-size: 0.85rem;
+  color: var(--texto-secundario);
+  margin-bottom: 0.7rem;
+  font-weight: 500;
+}
+.acciones-ficha { display: flex; flex-direction: column; gap: 0.6rem; }
+
+/* Visor Zoom pantalla completa */
+.visor-zoom {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 15, 15, 0.94);
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  cursor: zoom-out;
+}
+.visor-zoom img {
+  max-width: 95vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 4px;
+}
+.btn-cerrar-zoom {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: #FFFFFF;
+  color: #1E1E1E;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
 
 .pie {
   text-align: center;
-  padding: 2rem;
+  padding: 2.5rem 1.5rem;
   color: var(--texto-secundario);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   border-top: 1px solid var(--borde-suave);
 }
