@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¿Qué hacemos en Bellas Artes? — Galería y Archivo</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+  <header class="cabecera">
+    <div class="marca">
+      <h1>¿Qué hacemos en Bellas Artes?</h1>
+      <p>Exposición mensual y adquisición de obra joven</p>
+    </div>
+    <nav class="menu">
+      <button class="btn-nav activo" onclick="cambiarVista('actual')">Exposición del mes</button>
+      <button class="btn-nav" onclick="cambiarVista('archivo')">Archivo</button>
+      <button class="btn-nav" onclick="cambiarVista('participar')">Enviar obra</button>
+    </nav>
+  </header>
+
+  <main class="contenedor">
+    <!-- VISTA DE EXPOSICIÓN ACTUAL O ARCHIVO -->
+    <section id="vista-galeria">
+      <div class="barra-info">
+        <h2 id="titulo-sala">Exposición Actual</h2>
+        <div id="selector-meses" class="filtros-mes oculto"></div>
+      </div>
+      <div id="grid-obras" class="grid-obras"></div>
+    </section>
+
+    <!-- VISTA DE PARTICIPACIÓN PARA COMPAÑEROS -->
+    <section id="vista-participar" class="oculto">
+      <div class="caja-participar">
+        <h2>Presenta tu obra para la próxima exposición</h2>
+        <p>Cada mes renovamos la sala con propuestas de estudiantes de Bellas Artes. Rellena el formulario con las fotos, ficha técnica, enlaces (si es vídeo, juego o fotolibro) y cuéntanos por qué tu pieza debería formar parte de la muestra.</p>
+        <!-- Sustituye el enlace de abajo por el de tu Google Form o Tally -->
+        <a href="https://google.com" target="_blank" class="btn-principal">Abrir formulario de propuesta</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- VENTANA EMERGENTE (FICHA DE MUSEO) -->
+  <div id="modal-obra" class="modal oculto" onclick="cerrarModalFondo(event)">
+    <div class="modal-contenido">
+      <button class="btn-cerrar" onclick="cerrarModal()">✕ Cerrar ficha</button>
+      
+      <div class="modal-cuerpo">
+        <!-- Columna izquierda: Fotos y Vídeo -->
+        <div class="modal-media" id="modal-media"></div>
+
+        <!-- Columna derecha: Ficha Técnica -->
+        <div class="modal-info">
+          <span id="ficha-formato" class="etiqueta-formato"></span>
+          <h2 id="ficha-titulo"></h2>
+          <p id="ficha-artista" class="artista-nombre"></p>
+          
+          <div id="ficha-estado" class="estado-caja"></div>
+
+          <p id="ficha-descripcion" class="descripcion"></p>
+
+          <dl class="lista-tecnica">
+            <div><dt>Año</dt><dd id="ficha-anio"></dd></div>
+            <div><dt>Medidas</dt><dd id="ficha-medidas"></dd></div>
+            <div><dt>Materiales / Soporte</dt><dd id="ficha-materiales"></dd></div>
+            <div id="fila-video"><dt>Duración y Sonido</dt><dd id="ficha-video-info"></dd></div>
+            <div id="fila-cuidado"><dt>Cuidado y conservación</dt><dd id="ficha-cuidado"></dd></div>
+          </dl>
+
+          <div class="acciones-ficha">
+            <a id="btn-contacto" href="#" target="_blank" class="btn-principal">Contactar con el artista</a>
+            <a id="btn-enlace-extra" href="#" target="_blank" class="btn-secundario oculto">Ver proyecto / Comprar edición</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="pie">
+    <p>Proyecto expositivo independiente — Facultad de Bellas Artes.</p>
+  </footer>
+
+  <script src="obras.js"></script>
+  <script>
+    let vistaActual = 'actual';
+    let mesSeleccionado = '';
+
+    function iniciar() {
+      const mesesUnicos = [...new Set(OBRAS.map(o => o.mes))];
+      mesSeleccionado = mesesUnicos[0] || '';
+      
+      const contenedorMeses = document.getElementById('selector-meses');
+      mesesUnicos.forEach(mes => {
+        const btn = document.createElement('button');
+        btn.textContent = mes;
+        btn.className = 'btn-mes';
+        btn.onclick = () => { mesSeleccionado = mes; renderizarObras(); };
+        contenedorMeses.appendChild(btn);
+      });
+
+      renderizarObras();
+    }
+
+    function cambiarVista(vista) {
+      vistaActual = vista;
+      document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('activo'));
+      event.target.classList.add('activo');
+
+      const secGaleria = document.getElementById('vista-galeria');
+      const secParticipar = document.getElementById('vista-participar');
+      const selectorMeses = document.getElementById('selector-meses');
+      const tituloSala = document.getElementById('titulo-sala');
+
+      if (vista === 'participar') {
+        secGaleria.classList.add('oculto');
+        secParticipar.classList.remove('oculto');
+      } else {
+        secParticipar.classList.add('oculto');
+        secGaleria.classList.remove('oculto');
+        
+        if (vista === 'actual') {
+          mesSeleccionado = OBRAS[0].mes;
+          tituloSala.textContent = `Exposición Actual — ${mesSeleccionado}`;
+          selectorMeses.classList.add('oculto');
+        } else {
+          tituloSala.textContent = 'Archivo de Exposiciones';
+          selectorMeses.classList.remove('oculto');
+        }
+        renderizarObras();
+      }
+    }
+
+    function renderizarObras() {
+      const grid = document.getElementById('grid-obras');
+      grid.innerHTML = '';
+      
+      document.querySelectorAll('.btn-mes').forEach(b => {
+        b.classList.toggle('activo', b.textContent === mesSeleccionado);
+      });
+
+      const filtradas = OBRAS.filter(o => o.mes === mesSeleccionado);
+
+      filtradas.forEach((obra, index) => {
+        const card = document.createElement('article');
+        card.className = 'tarjeta-obra';
+        card.onclick = () => abrirModal(obra);
+
+        card.innerHTML = `
+          <div class="imagen-contenedor">
+            <img src="${obra.fotoPrincipal}" alt="${obra.titulo}" loading="lazy">
+            <span class="badge-formato">${obra.formato}</span>
+          </div>
+          <div class="info-tarjeta">
+            <h3>${obra.titulo}</h3>
+            <p class="autor">${obra.artista}</p>
+            <p class="estado-mini">${obra.estado}</p>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function abrirModal(obra) {
+      document.getElementById('ficha-formato').textContent = obra.formato;
+      document.getElementById('ficha-titulo').textContent = obra.titulo;
+      document.getElementById('ficha-artista').textContent = obra.artista;
+      document.getElementById('ficha-estado').textContent = obra.estado;
+      document.getElementById('ficha-descripcion').textContent = obra.descripcion;
+      document.getElementById('ficha-anio').textContent = obra.anio;
+      document.getElementById('ficha-medidas').textContent = obra.medidas;
+      document.getElementById('ficha-materiales').textContent = obra.materiales;
+
+      // Campos opcionales (videoarte y cuidado)
+      const filaVideo = document.getElementById('fila-video');
+      if (obra.infoVideo) {
+        filaVideo.classList.remove('oculto');
+        document.getElementById('ficha-video-info').textContent = obra.infoVideo;
+      } else {
+        filaVideo.classList.add('oculto');
+      }
+
+      const filaCuidado = document.getElementById('fila-cuidado');
+      if (obra.cuidado) {
+        filaCuidado.classList.remove('oculto');
+        document.getElementById('ficha-cuidado').textContent = obra.cuidado;
+      } else {
+        filaCuidado.classList.add('oculto');
+      }
+
+      // Botones de contacto y enlace extra (juego/fotolibro)
+      document.getElementById('btn-contacto').href = obra.contacto;
+      const btnExtra = document.getElementById('btn-enlace-extra');
+      if (obra.enlaceExtra) {
+        btnExtra.classList.remove('oculto');
+        btnExtra.href = obra.enlaceExtra;
+        btnExtra.textContent = obra.textoEnlaceExtra || 'Ver enlace del proyecto';
+      } else {
+        btnExtra.classList.add('oculto');
+      }
+
+      // Galería multimedia (Vídeo + Foto principal + Fotos detalle)
+      const mediaCont = document.getElementById('modal-media');
+      mediaCont.innerHTML = '';
+
+      if (obra.videoEmbed) {
+        mediaCont.innerHTML += `<div class="video-wrapper"><iframe src="${obra.videoEmbed}" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
+      }
+
+      mediaCont.innerHTML += `<img src="${obra.fotoPrincipal}" alt="${obra.titulo}" class="foto-grande">`;
+
+      if (obra.fotosDetalle && obra.fotosDetalle.length > 0) {
+        obra.fotosDetalle.forEach(foto => {
+          mediaCont.innerHTML += `<img src="${foto}" alt="Detalle de ${obra.titulo}" class="foto-detalle">`;
+        });
+      }
+
+      document.getElementById('modal-obra').classList.remove('oculto');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModal() {
+      document.getElementById('modal-obra').classList.add('oculto');
+      document.getElementById('modal-media').innerHTML = '';
+      document.body.style.overflow = 'auto';
+    }
+
+    function cerrarModalFondo(e) {
+      if (e.target.id === 'modal-obra') cerrarModal();
+    }
+
+    iniciar();
+  </script>
+</body>
+</html>
