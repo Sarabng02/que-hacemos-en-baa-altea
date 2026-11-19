@@ -3,25 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>¿Qué hacemos en Bellas Artes? — Galería y Archivo</title>
+  <title>¿Qué hacemos en Bellas Artes? — Altea</title>
   <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
 
   <header class="cabecera">
-    <div class="marca">
-      <h1>¿Qué hacemos en Bellas Artes?</h1>
-      <p>Exposición mensual y adquisición de obra joven</p>
+    <div class="marca-mini" onclick="irAlInicio()">
+      <span>¿Qué hacemos en Bellas Artes?</span>
     </div>
     <nav class="menu">
-      <button class="btn-nav activo" onclick="cambiarVista('actual')">Exposición del mes</button>
-      <button class="btn-nav" onclick="cambiarVista('archivo')">Archivo</button>
-      <button class="btn-nav" onclick="cambiarVista('participar')">Enviar obra</button>
+      <button class="btn-nav activo" id="nav-actual" onclick="cambiarVista('actual')">Exposición del mes</button>
+      <button class="btn-nav" id="nav-archivo" onclick="cambiarVista('archivo')">Archivo</button>
+      <button class="btn-nav" id="nav-participar" onclick="cambiarVista('participar')">Enviar obra propia</button>
     </nav>
   </header>
 
-  <main class="contenedor">
-    <!-- VISTA DE EXPOSICIÓN ACTUAL O ARCHIVO -->
+  <section id="portada-hero" class="hero">
+    <div class="hero-contenido">
+      <p class="hero-etiqueta">Facultad de Bellas Artes de Altea</p>
+      <h1>¿Qué hacemos en Bellas Artes?</h1>
+      <p class="hero-subtitulo">Exposición mensual y adquisición de obra joven</p>
+      <a href="#zona-principal" class="btn-explorar" onclick="cambiarVista('actual')">Explorar exposición ↓</a>
+    </div>
+  </section>
+
+  <main id="zona-principal" class="contenedor">
     <section id="vista-galeria">
       <div class="barra-info">
         <h2 id="titulo-sala">Exposición Actual</h2>
@@ -30,34 +37,25 @@
       <div id="grid-obras" class="grid-obras"></div>
     </section>
 
-    <!-- VISTA DE PARTICIPACIÓN PARA COMPAÑEROS -->
     <section id="vista-participar" class="oculto">
       <div class="caja-participar">
-        <h2>Presenta tu obra para la próxima exposición</h2>
-        <p>Cada mes renovamos la sala con propuestas de estudiantes de Bellas Artes. Rellena el formulario con las fotos, ficha técnica, enlaces (si es vídeo, juego o fotolibro) y cuéntanos por qué tu pieza debería formar parte de la muestra.</p>
-        <!-- Sustituye el enlace de abajo por el de tu Google Form o Tally -->
+        <h2>Envía tu obra para la próxima exposición</h2>
+        <p>Cada mes renovamos la sala con propuestas de estudiantes de Bellas Artes. Rellena el formulario y cuéntanos por qué tu pieza debería formar parte de la muestra.</p>
         <a href="https://google.com" target="_blank" class="btn-principal">Abrir formulario de propuesta</a>
       </div>
     </section>
   </main>
 
-  <!-- VENTANA EMERGENTE (FICHA DE MUSEO) -->
   <div id="modal-obra" class="modal oculto" onclick="cerrarModalFondo(event)">
     <div class="modal-contenido">
       <button class="btn-cerrar" onclick="cerrarModal()">✕ Cerrar ficha</button>
-      
       <div class="modal-cuerpo">
-        <!-- Columna izquierda: Fotos y Vídeo -->
         <div class="modal-media" id="modal-media"></div>
-
-        <!-- Columna derecha: Ficha Técnica -->
         <div class="modal-info">
           <span id="ficha-formato" class="etiqueta-formato"></span>
           <h2 id="ficha-titulo"></h2>
           <p id="ficha-artista" class="artista-nombre"></p>
-          
           <div id="ficha-estado" class="estado-caja"></div>
-
           <p id="ficha-descripcion" class="descripcion"></p>
 
           <dl class="lista-tecnica">
@@ -68,80 +66,116 @@
             <div id="fila-cuidado"><dt>Cuidado y conservación</dt><dd id="ficha-cuidado"></dd></div>
           </dl>
 
-          <div class="acciones-ficha">
-            <a id="btn-contacto" href="#" target="_blank" class="btn-principal">Contactar con el artista</a>
-            <a id="btn-enlace-extra" href="#" target="_blank" class="btn-secundario oculto">Ver proyecto / Comprar edición</a>
+          <div class="bloque-contacto">
+            <p class="titulo-contacto">Contacto y enlaces del artista</p>
+            <div class="acciones-ficha" id="contenedor-botones-contacto"></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <footer class="pie">
-    <p>Proyecto expositivo independiente — Facultad de Bellas Artes.</p>
-  </footer>
+  <div id="visor-zoom" class="visor-zoom oculto" onclick="cerrarZoom()">
+    <button class="btn-cerrar-zoom" onclick="cerrarZoom()">✕ Cerrar imagen</button>
+    <img id="imagen-zoom" src="" alt="Vista ampliada">
+  </div>
 
-  <script src="obras.js"></script>
+  <footer class="pie">
+    <p>Facultad de Bellas Artes de Altea - AEIOU Sara Vañó, 2026</p>
+  </footer>
+  <script src="actual.js"></script>
+  <script src="archivo/lista.js"></script>
   <script>
-    let vistaActual = 'actual';
-    let mesSeleccionado = '';
+    let obrasMostradas = [];
 
     function iniciar() {
-      const mesesUnicos = [...new Set(OBRAS.map(o => o.mes))];
-      mesSeleccionado = mesesUnicos[0] || '';
-      
+      cargarExposicionActual();
+      construirBotonesArchivo();
+    }
+
+    function cargarExposicionActual() {
+      obrasMostradas = EXPO_ACTUAL.obras;
+      document.getElementById('titulo-sala').textContent = `Exposición Actual — ${EXPO_ACTUAL.mes}`;
+      renderizarObras(obrasMostradas);
+    }
+
+    function construirBotonesArchivo() {
       const contenedorMeses = document.getElementById('selector-meses');
-      mesesUnicos.forEach(mes => {
+      contenedorMeses.innerHTML = '';
+      
+      EDICIONES_ANTERIORES.forEach((edicion) => {
         const btn = document.createElement('button');
-        btn.textContent = mes;
+        btn.textContent = edicion.mes;
         btn.className = 'btn-mes';
-        btn.onclick = () => { mesSeleccionado = mes; renderizarObras(); };
+        btn.onclick = () => cargarArchivoMes(edicion, btn);
         contenedorMeses.appendChild(btn);
       });
+    }
 
-      renderizarObras();
+    function cargarArchivoMes(edicion, botonPulsado) {
+      document.querySelectorAll('.btn-mes').forEach(b => b.classList.remove('activo'));
+      if (botonPulsado) botonPulsado.classList.add('activo');
+      
+      document.getElementById('titulo-sala').textContent = `Catálogo de Archivo — ${edicion.mes}`;
+      document.getElementById('grid-obras').innerHTML = '<p>Cargando catálogo...</p>';
+
+      const scriptViejo = document.getElementById('script-archivo-dinamico');
+      if (scriptViejo) scriptViejo.remove();
+
+      const script = document.createElement('script');
+      script.id = 'script-archivo-dinamico';
+      script.src = edicion.archivo;
+      script.onload = () => {
+        obrasMostradas = EXPO_ARCHIVO.obras;
+        renderizarObras(obrasMostradas);
+      };
+      document.body.appendChild(script);
+    }
+
+    function irAlInicio() {
+      cambiarVista('actual');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function cambiarVista(vista) {
-      vistaActual = vista;
       document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('activo'));
-      event.target.classList.add('activo');
+      const btnActivo = document.getElementById(`nav-${vista}`);
+      if (btnActivo) btnActivo.classList.add('activo');
 
       const secGaleria = document.getElementById('vista-galeria');
       const secParticipar = document.getElementById('vista-participar');
       const selectorMeses = document.getElementById('selector-meses');
-      const tituloSala = document.getElementById('titulo-sala');
 
       if (vista === 'participar') {
         secGaleria.classList.add('oculto');
         secParticipar.classList.remove('oculto');
+        document.getElementById('zona-principal').scrollIntoView({ behavior: 'smooth' });
       } else {
         secParticipar.classList.add('oculto');
         secGaleria.classList.remove('oculto');
         
         if (vista === 'actual') {
-          mesSeleccionado = OBRAS[0].mes;
-          tituloSala.textContent = `Exposición Actual — ${mesSeleccionado}`;
           selectorMeses.classList.add('oculto');
+          cargarExposicionActual();
         } else {
-          tituloSala.textContent = 'Archivo de Exposiciones';
           selectorMeses.classList.remove('oculto');
+          document.getElementById('zona-principal').scrollIntoView({ behavior: 'smooth' });
+          if (EDICIONES_ANTERIORES.length > 0) {
+            const primerBtn = selectorMeses.querySelector('.btn-mes');
+            cargarArchivoMes(EDICIONES_ANTERIORES[0], primerBtn);
+          } else {
+            document.getElementById('titulo-sala').textContent = 'Archivo de Exposiciones';
+            document.getElementById('grid-obras').innerHTML = '<p>Aún no hay ediciones anteriores archivadas.</p>';
+          }
         }
-        renderizarObras();
       }
     }
 
-    function renderizarObras() {
+    function renderizarObras(lista) {
       const grid = document.getElementById('grid-obras');
       grid.innerHTML = '';
-      
-      document.querySelectorAll('.btn-mes').forEach(b => {
-        b.classList.toggle('activo', b.textContent === mesSeleccionado);
-      });
 
-      const filtradas = OBRAS.filter(o => o.mes === mesSeleccionado);
-
-      filtradas.forEach((obra, index) => {
+      lista.forEach((obra) => {
         const card = document.createElement('article');
         card.className = 'tarjeta-obra';
         card.onclick = () => abrirModal(obra);
@@ -171,7 +205,6 @@
       document.getElementById('ficha-medidas').textContent = obra.medidas;
       document.getElementById('ficha-materiales').textContent = obra.materiales;
 
-      // Campos opcionales (videoarte y cuidado)
       const filaVideo = document.getElementById('fila-video');
       if (obra.infoVideo) {
         filaVideo.classList.remove('oculto');
@@ -188,30 +221,36 @@
         filaCuidado.classList.add('oculto');
       }
 
-      // Botones de contacto y enlace extra (juego/fotolibro)
-      document.getElementById('btn-contacto').href = obra.contacto;
-      const btnExtra = document.getElementById('btn-enlace-extra');
+      const contBotones = document.getElementById('contenedor-botones-contacto');
+      contBotones.innerHTML = '';
+
+      if (obra.instagram) {
+        contBotones.innerHTML += `<a href="${obra.instagram}" target="_blank" class="btn-principal">Instagram del artista</a>`;
+      }
+      if (obra.email) {
+        const hrefMail = obra.email.startsWith('mailto:') ? obra.email : `mailto:${obra.email}`;
+        contBotones.innerHTML += `<a href="${hrefMail}" class="btn-secundario">Enviar correo (Email)</a>`;
+      }
+      if (obra.portfolio) {
+        contBotones.innerHTML += `<a href="${obra.portfolio}" target="_blank" class="btn-secundario">Ver portfolio del artista</a>`;
+      }
       if (obra.enlaceExtra) {
-        btnExtra.classList.remove('oculto');
-        btnExtra.href = obra.enlaceExtra;
-        btnExtra.textContent = obra.textoEnlaceExtra || 'Ver enlace del proyecto';
-      } else {
-        btnExtra.classList.add('oculto');
+        const textoBtn = obra.textoEnlaceExtra || 'Ver proyecto / Comprar edición';
+        contBotones.innerHTML += `<a href="${obra.enlaceExtra}" target="_blank" class="btn-destacado">${textoBtn}</a>`;
       }
 
-      // Galería multimedia (Vídeo + Foto principal + Fotos detalle)
       const mediaCont = document.getElementById('modal-media');
-      mediaCont.innerHTML = '';
+      mediaCont.innerHTML = '<p class="aviso-zoom">Haz clic en cualquier imagen para verla a pantalla completa</p>';
 
       if (obra.videoEmbed) {
         mediaCont.innerHTML += `<div class="video-wrapper"><iframe src="${obra.videoEmbed}" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
       }
 
-      mediaCont.innerHTML += `<img src="${obra.fotoPrincipal}" alt="${obra.titulo}" class="foto-grande">`;
+      mediaCont.innerHTML += `<img src="${obra.fotoPrincipal}" alt="${obra.titulo}" class="foto-grande" onclick="abrirZoom('${obra.fotoPrincipal}')">`;
 
       if (obra.fotosDetalle && obra.fotosDetalle.length > 0) {
         obra.fotosDetalle.forEach(foto => {
-          mediaCont.innerHTML += `<img src="${foto}" alt="Detalle de ${obra.titulo}" class="foto-detalle">`;
+          mediaCont.innerHTML += `<img src="${foto}" alt="Detalle de ${obra.titulo}" class="foto-detalle" onclick="abrirZoom('${foto}')">`;
         });
       }
 
@@ -227,6 +266,16 @@
 
     function cerrarModalFondo(e) {
       if (e.target.id === 'modal-obra') cerrarModal();
+    }
+
+    function abrirZoom(rutaImagen) {
+      document.getElementById('imagen-zoom').src = rutaImagen;
+      document.getElementById('visor-zoom').classList.remove('oculto');
+    }
+
+    function cerrarZoom() {
+      document.getElementById('visor-zoom').classList.add('oculto');
+      document.getElementById('imagen-zoom').src = '';
     }
 
     iniciar();
