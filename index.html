@@ -1,3 +1,84 @@
+      document.getElementById('ficha-anio').textContent = obra.anio;
+      document.getElementById('ficha-medidas').textContent = obra.medidas;
+      document.getElementById('ficha-materiales').textContent = obra.materiales;
+
+      const filaVideo = document.getElementById('fila-video');
+      if (obra.infoVideo) {
+        filaVideo.classList.remove('oculto');
+        document.getElementById('ficha-video-info').textContent = obra.infoVideo;
+      } else {
+        filaVideo.classList.add('oculto');
+      }
+
+      const filaCuidado = document.getElementById('fila-cuidado');
+      if (obra.cuidado) {
+        filaCuidado.classList.remove('oculto');
+        document.getElementById('ficha-cuidado').textContent = obra.cuidado;
+      } else {
+        filaCuidado.classList.add('oculto');
+      }
+
+      const contBotones = document.getElementById('contenedor-botones-contacto');
+      contBotones.innerHTML = '';
+
+      if (obra.instagram) {
+        contBotones.innerHTML += `<a href="${obra.instagram}" target="_blank" class="btn-principal">Instagram del artista</a>`;
+      }
+      if (obra.email) {
+        const hrefMail = obra.email.startsWith('mailto:') ? obra.email : `mailto:${obra.email}`;
+        contBotones.innerHTML += `<a href="${hrefMail}" class="btn-secundario">Enviar correo (Email)</a>`;
+      }
+      if (obra.portfolio) {
+        contBotones.innerHTML += `<a href="${obra.portfolio}" target="_blank" class="btn-secundario">Ver portfolio del artista</a>`;
+      }
+      if (obra.enlaceExtra) {
+        const textoBtn = obra.textoEnlaceExtra || 'Ver proyecto / Comprar edición';
+        contBotones.innerHTML += `<a href="${obra.enlaceExtra}" target="_blank" class="btn-destacado">${textoBtn}</a>`;
+      }
+
+      const mediaCont = document.getElementById('modal-media');
+      mediaCont.innerHTML = '<p class="aviso-zoom">Haz clic en cualquier imagen para verla a pantalla completa</p>';
+
+      if (obra.videoEmbed) {
+        mediaCont.innerHTML += `<div class="video-wrapper"><iframe src="${obra.videoEmbed}" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
+      }
+
+      mediaCont.innerHTML += `<img src="${obra.fotoPrincipal}" alt="${obra.titulo}" class="foto-grande" onclick="abrirZoom('${obra.fotoPrincipal}')">`;
+
+      if (obra.fotosDetalle && obra.fotosDetalle.length > 0) {
+        obra.fotosDetalle.forEach(foto => {
+          mediaCont.innerHTML += `<img src="${foto}" alt="Detalle de ${obra.titulo}" class="foto-detalle" onclick="abrirZoom('${foto}')">`;
+        });
+      }
+
+      document.getElementById('modal-obra').classList.remove('oculto');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModal() {
+      document.getElementById('modal-obra').classList.add('oculto');
+      document.getElementById('modal-media').innerHTML = '';
+      document.body.style.overflow = 'auto';
+    }
+
+    function cerrarModalFondo(e) {
+      if (e.target.id === 'modal-obra') cerrarModal();
+    }
+
+    function abrirZoom(rutaImagen) {
+      document.getElementById('imagen-zoom').src = rutaImagen;
+      document.getElementById('visor-zoom').classList.remove('oculto');
+    }
+
+    function cerrarZoom() {
+      document.getElementById('visor-zoom').classList.add('oculto');
+      document.getElementById('imagen-zoom').src = '';
+    }
+
+    iniciar();
+  </script>
+</body>
+</html>
 <!DOCTYPE html>
 <html lang="es">
 <head>
